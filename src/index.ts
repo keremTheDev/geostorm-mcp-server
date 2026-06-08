@@ -1,8 +1,11 @@
 import axios, { AxiosError } from "axios";
+import dotenv from "dotenv";
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
 import type { CallToolResult } from "@modelcontextprotocol/sdk/types.js";
 import { z } from "zod";
+
+dotenv.config();
 
 const NASA_DONKI_CME_URL = "https://api.nasa.gov/DONKI/CME";
 const NOAA_SWPC_ALERTS_URL = "https://services.swpc.noaa.gov/products/alerts.json";
