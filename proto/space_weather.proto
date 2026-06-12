@@ -1,0 +1,55 @@
+syntax = "proto3";
+
+package geostorm.spaceweather.v1;
+
+service SpaceWeatherService {
+  rpc GetContext (GetContextRequest) returns (SpaceWeatherContextResponse);
+  rpc GetNoaaSwpcAlerts (NoaaSwpcAlertsRequest) returns (RawJsonResponse);
+  rpc GetNasaDonkiCmes (NasaDonkiCmesRequest) returns (RawJsonResponse);
+  rpc Health (HealthRequest) returns (HealthResponse);
+  rpc Ready (ReadyRequest) returns (HealthResponse);
+}
+
+message GetContextRequest {
+  string start_date = 1;
+  string end_date = 2;
+}
+
+message NoaaSwpcAlertsRequest {}
+
+message NasaDonkiCmesRequest {
+  string start_date = 1;
+  string end_date = 2;
+}
+
+message RawJsonResponse {
+  string source = 1;
+  string fetched_at = 2;
+  string raw_json = 3;
+  repeated string errors = 4;
+}
+
+message DateWindow {
+  string start_date = 1;
+  string end_date = 2;
+}
+
+message SpaceWeatherContextResponse {
+  string source = 1;
+  string fetched_at = 2;
+  DateWindow date_window = 3;
+  string noaa_swpc_alerts_json = 4;
+  string nasa_donki_cmes_json = 5;
+  string risk_signals_json = 6;
+  repeated string errors = 7;
+}
+
+message HealthRequest {}
+
+message ReadyRequest {}
+
+message HealthResponse {
+  string status = 1;
+  string service = 2;
+  string message = 3;
+}

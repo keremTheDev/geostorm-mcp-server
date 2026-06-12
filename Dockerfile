@@ -6,6 +6,7 @@ COPY package*.json ./
 RUN npm ci
 
 COPY tsconfig.json ./
+COPY proto ./proto
 COPY src ./src
 RUN npm run build
 
@@ -18,9 +19,9 @@ COPY package*.json ./
 RUN npm ci --omit=dev
 
 COPY --from=build /app/dist ./dist
+COPY proto ./proto
 
-# The MCP server uses stdio transport. Port 6274 is documented for tooling
-# compatibility only; this container does not serve HTTP by default.
 EXPOSE 6274
+EXPOSE 50051
 
-CMD ["node", "dist/index.js"]
+CMD ["node", "dist/grpc_server.js"]
