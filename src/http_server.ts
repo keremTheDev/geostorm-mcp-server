@@ -50,6 +50,9 @@ async function handleRequest(req: IncomingMessage, res: ServerResponse): Promise
         status: "ready",
         service: SERVICE_NAME,
         nasa_api_key_configured: Boolean(process.env.NASA_API_KEY),
+        esa_enabled: ["1", "true", "yes", "on"].includes(
+          (process.env.ESA_ENABLED || "").trim().toLowerCase(),
+        ),
       });
       return;
     case "/context":

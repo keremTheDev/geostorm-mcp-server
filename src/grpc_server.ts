@@ -46,6 +46,10 @@ type SpaceWeatherContextResponse = {
   nasa_donki_cmes_json: string;
   risk_signals_json: string;
   errors: string[];
+  esa_source_status: string;
+  esa_data_json: string;
+  esa_dataset_id: string;
+  esa_error: string;
 };
 
 type HealthResponse = {
@@ -158,6 +162,10 @@ const implementation = {
       nasa_donki_cmes_json: JSON.stringify(context.nasa_donki_cmes),
       risk_signals_json: JSON.stringify(context.risk_signals),
       errors: context.errors,
+      esa_source_status: context.esa_source_status,
+      esa_data_json: context.esa_data_json,
+      esa_dataset_id: context.esa_dataset_id,
+      esa_error: context.esa_error,
     });
   },
 };

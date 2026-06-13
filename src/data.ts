@@ -1,5 +1,7 @@
 import axios, { AxiosError } from "axios";
 
+import { fetchEsaHapiContext, type EsaSourceStatus } from "./esa_hapi.js";
+
 export const NASA_DONKI_CME_URL = "https://api.nasa.gov/DONKI/CME";
 export const NOAA_SWPC_ALERTS_URL =
   "https://services.swpc.noaa.gov/products/alerts.json";
@@ -27,6 +29,10 @@ export type SpaceWeatherContext = {
   date_window: DateWindow;
   noaa_swpc_alerts: unknown[];
   nasa_donki_cmes: unknown[];
+  esa_source_status: EsaSourceStatus;
+  esa_data_json: string;
+  esa_dataset_id: string;
+  esa_error: string;
   risk_signals: {
     has_noaa_alerts: boolean;
     cme_count: number;
@@ -99,10 +105,15 @@ export async function buildSpaceWeatherContext(
   const errors: string[] = [];
   let noaaAlerts: unknown[] = [];
   let cmeRecords: unknown[] = [];
+  let esaSourceStatus: EsaSourceStatus = "disabled";
+  let esaDataJson = "[]";
+  let esaDatasetId = "";
+  let esaError = "";
 
-  const [noaaResult, cmeResult] = await Promise.allSettled([
+  const [noaaResult, cmeResult, esaResult] = await Promise.allSettled([
     fetchNoaaSwpcAlerts(),
     fetchCoronalMassEjections(requestedWindow),
+    fetchEsaHapiContext(),
   ]);
 
   if (noaaResult.status === "fulfilled") {
@@ -117,12 +128,30 @@ export async function buildSpaceWeatherContext(
     errors.push(`NASA DONKI CMEs unavailable: ${getErrorMessage(cmeResult.reason)}`);
   }
 
+  if (esaResult.status === "fulfilled") {
+    esaSourceStatus = esaResult.value.status;
+    esaDataJson = JSON.stringify(esaResult.value.data);
+    esaDatasetId = esaResult.value.datasetId;
+    esaError = esaResult.value.error;
+    if (esaError && esaSourceStatus !== "disabled") {
+      errors.push(esaError);
+    }
+  } else {
+    esaSourceStatus = "unavailable";
+    esaError = `ESA SWE HAPI unavailable: ${getErrorMessage(esaResult.reason)}`;
+    errors.push(esaError);
+  }
+
   return {
     source: "geostorm-mcp-server",
     fetched_at: new Date().toISOString(),
     date_window: requestedWindow,
     noaa_swpc_alerts: noaaAlerts,
     nasa_donki_cmes: cmeRecords,
+    esa_source_status: esaSourceStatus,
+    esa_data_json: esaDataJson,
+    esa_dataset_id: esaDatasetId,
+    esa_error: esaError,
     risk_signals: {
       has_noaa_alerts: noaaAlerts.length > 0,
       cme_count: cmeRecords.length,
