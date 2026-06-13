@@ -12,7 +12,8 @@ import {
 
 dotenv.config();
 
-const PORT = Number(process.env.PORT || "6274");
+const HTTP_HOST = process.env.HTTP_HOST || "0.0.0.0";
+const HTTP_PORT = Number(process.env.HTTP_PORT || process.env.PORT || "6274");
 const SERVICE_NAME = "geostorm-mcp-server";
 
 type JsonBody = Record<string, unknown> | unknown[];
@@ -81,6 +82,6 @@ function writeJson(res: ServerResponse, statusCode: number, body: JsonBody): voi
   res.end(JSON.stringify(body));
 }
 
-server.listen(PORT, "0.0.0.0", () => {
-  console.error(`${SERVICE_NAME} HTTP service listening on port ${PORT}`);
+server.listen(HTTP_PORT, HTTP_HOST, () => {
+  console.error(`${SERVICE_NAME} HTTP service listening on ${HTTP_HOST}:${HTTP_PORT}`);
 });
