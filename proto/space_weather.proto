@@ -42,6 +42,10 @@ message SpaceWeatherContextResponse {
   string nasa_donki_cmes_json = 5;
   string risk_signals_json = 6;
   repeated string errors = 7;
+  string esa_source_status = 8;
+  string esa_data_json = 9;
+  string esa_dataset_id = 10;
+  string esa_error = 11;
 }
 
 message HealthRequest {}
